@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { check, validationResult } = require("express-validator");
+const { check, validationResult, param } = require("express-validator");
 const router = Router();
 const userModel = require("../model/userModel");
 const { createResponse } = require("../../../utils/utils");
@@ -32,5 +32,27 @@ router.get("/user", async (req, res) => {
     const result = await userModel.getUsers();
     res.status(200).json(createResponse('success', result));
 });
+
+// GET user by id
+router.get("/user/:id",
+    [
+        param("id").isInt().withMessage("User Id must be an integer")
+    ],
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json(createResponse("error", null, errors.array()[0].msg));
+        }
+
+        try {
+            const result = await userModel.getUserById(req.params.id);
+            if (!result) {
+                return res.status(404).json(createResponse("error", null, `User with id: ${req.params.id} not found`));
+            }
+            res.status(200).json(createResponse("success", result));
+        } catch (error) {
+            res.status(500).json(createResponse("error", null, error.message));
+        }
+    });
 
 module.exports = router;

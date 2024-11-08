@@ -17,8 +17,12 @@ const connection = mysql.createPool({
  * @returns {Promise<Array>} A promise that resolves to an array of user objects.
  */
 async function getUsers() {
-    const result = await connection.query("SELECT * FROM users");
-    return result[0];
+    try {
+        const result = await connection.query("SELECT * FROM users");
+        return result[0];
+    } catch (error) {
+        throw new Error(error.message);
+    }
 }
 
 /**
@@ -44,4 +48,19 @@ async function createUser(newUser) {
     }
 }
 
-module.exports = { getUsers, createUser };
+/**
+ * Retrieves a user from the database by their ID.
+ * @param {number} id - The ID of the user to retrieve.
+ * @returns {Promise<Object>} A promise that resolves to the user object if found, or null if not found.
+ * @throws {Error} If there is an error during the database query.
+ */
+async function getUserById(id) {
+    try {
+        const [result] = await connection.query("SELECT * FROM users WHERE id = ?", [id]);
+        return result[0];
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+module.exports = { getUsers, createUser, getUserById };
