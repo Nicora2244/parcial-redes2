@@ -92,10 +92,12 @@ router.delete("/user/:id",
 
         try {
             const result = await userModel.deleteUserById(req.params.id);
-            if (!result.affectedRows) {
-                return res.status(404).json(createResponse("error", null, `User with id: ${req.params.id} not found`));
+
+            if (result.hasOwnProperty('user')) {
+                res.status(200).json(createResponse("success", result.user, "User deleted successfully"));
+            } else {
+                res.status(404).json(createResponse("error", null, `User with id: ${req.params.id} not found`));
             }
-            res.status(200).json(createResponse("success", null, "User deleted successfully"));
         } catch (error) {
             res.status(500).json(createResponse("error", null, error.message));
         }

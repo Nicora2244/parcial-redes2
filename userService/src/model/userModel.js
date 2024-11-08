@@ -95,10 +95,13 @@ async function updateUserById(id, newUser) {
  */
 async function deleteUserById(id) {
     try {
+        const [user] = await connection.query("SELECT * FROM users WHERE id = ?", [id]);
 
         const [result] = await connection.query('DELETE FROM users WHERE id = ?', [id]);
-
-        return result;
+        if (result.affectedRows > 0 && Array.isArray(user) && user.length > 0) {
+            return { result, user: user[0] }
+        }
+        return { result };
     } catch (error) {
         throw new Error(error.message);
     }
