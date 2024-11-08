@@ -55,4 +55,28 @@ router.get("/user/:id",
         }
     });
 
+// PUT update user by id
+router.put("/user/:id",
+    [
+        param("id").isInt().withMessage("User Id must be an integer"),
+        check("full_name").notEmpty().withMessage("Full name is required").isString().withMessage("Full name must be a string"),
+        check("username").notEmpty().withMessage("Username is required").isString().withMessage("Username must be a string"),
+        check("password").notEmpty().withMessage("Password is required").isString().withMessage("Password must be a string"),
+        check("role").notEmpty().withMessage("Role is required").isString().withMessage("Role must be a string").isIn(validRoles).withMessage(`Role must be one of the following: ${validRoles.join(", ")}`),
+    ],
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json(createResponse("error", null, errors.array()));
+        }
+
+        try {
+            const result = await userModel.updateUserById(req.params.id, req.body);
+            res.status(200).json(createResponse("success", result, "User updated successfully"));
+        } catch (error) {
+            res.status(500).json(createResponse("error", null, error.message));
+        }
+
+    });
+
 module.exports = router;

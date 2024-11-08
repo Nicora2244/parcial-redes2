@@ -63,4 +63,28 @@ async function getUserById(id) {
     }
 }
 
-module.exports = { getUsers, createUser, getUserById };
+/**
+ * Updates a user in the database by their ID.
+ * @param {number} id - The ID of the user to update.
+ * @param {Object} newUser - The new user data.
+ * @param {string} newUser.full_name - The full name of the user.
+ * @param {string} newUser.username - The username of the user.
+ * @param {string} newUser.password - The password of the user.
+ * @param {string} newUser.role - The role of the user.
+ * @returns {Promise<Object[]>} A promise that resolves to an array containing the updated user data.
+ * @throws {Error.message} If there is an error during the database query.
+ */
+async function updateUserById(id, newUser) {
+    try {
+        await connection.query(
+            "UPDATE users SET full_name = ?, username = ?, password = ?, role = ? WHERE id = ?",
+            [newUser.full_name, newUser.username, newUser.password, newUser.role, id]
+        );
+
+        return [{ id, ...newUser }];
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+module.exports = { getUsers, createUser, getUserById, updateUserById };
