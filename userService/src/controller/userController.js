@@ -79,4 +79,26 @@ router.put("/user/:id",
 
     });
 
+// DELETE user by id
+router.delete("/user/:id",
+    [
+        param("id").isInt().withMessage("User Id must be an integer")
+    ],
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json(createResponse("error", null, errors.array()[0].msg));
+        }
+
+        try {
+            const result = await userModel.deleteUserById(req.params.id);
+            if (!result.affectedRows) {
+                return res.status(404).json(createResponse("error", null, `User with id: ${req.params.id} not found`));
+            }
+            res.status(200).json(createResponse("success", null, "User deleted successfully"));
+        } catch (error) {
+            res.status(500).json(createResponse("error", null, error.message));
+        }
+    });
+
 module.exports = router;

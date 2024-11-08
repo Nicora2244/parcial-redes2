@@ -87,4 +87,21 @@ async function updateUserById(id, newUser) {
     }
 }
 
-module.exports = { getUsers, createUser, getUserById, updateUserById };
+/**
+ * Deletes a user from the database by their ID.
+ * @param {number} id - The ID of the user to delete.
+ * @returns {Promise<Object>} The result of the deletion query.
+ * @throws {Error} If there is an error during the deletion process.
+ */
+async function deleteUserById(id) {
+    try {
+
+        const [result] = await connection.query('DELETE FROM users WHERE id = ?', [id]);
+
+        return result;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+module.exports = { getUsers, createUser, getUserById, updateUserById, deleteUserById };
