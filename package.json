@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "start-users": "node userService/src/index.js",
-    "dev-users": "nodemon userService/src/index.js"
+    "dev-users": "nodemon userService/src/index.js",
+    "start-messages": "node messageService/src/index.js",
+    "dev-messages": "nodemon messageService/src/index.js"
   },
   "keywords": [],
   "author": "nicksiuxs",
