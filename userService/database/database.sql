@@ -25,4 +25,4 @@ CREATE TABLE follows (
     FOREIGN KEY (user_p) REFERENCES users(id),
     FOREIGN KEY (user_f) REFERENCES users(id),
     UNIQUE (user_p, user_f)
-);s
+);
