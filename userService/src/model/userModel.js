@@ -1,4 +1,5 @@
 const mysql = require("mysql2/promise");
+const bcrypt = require('bcryptjs');
 
 const DB_HOST_USER = process.env.DB_HOST_USER || "localhost";
 const DB_USER_USER = process.env.DB_USER_USER || "root";
@@ -37,6 +38,9 @@ async function getUsers() {
  */
 async function createUser(newUser) {
     try {
+        const hashedPassword = bcrypt.hashSync(newUser.password, 8);
+        newUser.password = hashedPassword;
+
         const [result] = await connection.query(
             "INSERT INTO users (full_name, username, password, role) VALUES (?, ?, ?, ?)",
             [newUser.full_name, newUser.username, newUser.password, newUser.role]
@@ -62,6 +66,22 @@ async function getUserById(id) {
         throw new Error(error.message);
     }
 }
+
+/**
+ * Log in a user by their username.
+ * @param {string} username - The username of the user to log in.
+ * @returns {Promise<Object>} A promise that resolves to the user's data.
+ * @throws {Error} If there is an error during the database query.
+ */
+async function getUserByEmail(username) {
+    try {
+        const [result] = await connection.query("SELECT * FROM users WHERE username = ? ", [username]);
+        return result[0];
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
 
 /**
  * Updates a user in the database by their ID.
@@ -107,4 +127,4 @@ async function deleteUserById(id) {
     }
 }
 
-module.exports = { getUsers, createUser, getUserById, updateUserById, deleteUserById };
+module.exports = { getUsers, createUser, getUserById, getUserByEmail, updateUserById, deleteUserById };
