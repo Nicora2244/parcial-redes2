@@ -48,4 +48,15 @@ router.get("/followers", async (req, res) => {
     }
 });
 
+router.get("/following", async (req, res) => {
+    try {
+        const userId = req.userId;
+
+        const followers = await followModel.getFollowing(userId);
+        res.status(200).json(createResponse("success", followers));
+    } catch (error) {
+        res.status(500).json(createResponse("error", null, error.message));
+    }
+});
+
 module.exports = router;

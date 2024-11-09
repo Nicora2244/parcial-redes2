@@ -54,4 +54,25 @@ async function getFollowers(userId) {
     }
 }
 
-module.exports = { followUser, getFollowers };
+/**
+ * Retrieves the users that a user is following by their ID.
+ * @param {number} userId - The ID of the user to retrieve followings for.
+ * @returns {Promise<Array>} A promise that resolves to an array of following user objects.
+ * @throws {Error} If there is an error during the database query.
+ */
+async function getFollowing(userId) {
+    try {
+        const [followers] = await connection.query(
+            `SELECT u.id, u.username, u.full_name
+             FROM follows f
+             INNER JOIN users u ON f.user_f = u.id
+             WHERE f.user_p = ?`,
+            [userId]
+        );
+        return followers;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+module.exports = { followUser, getFollowers, getFollowing };
