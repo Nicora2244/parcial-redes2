@@ -31,4 +31,19 @@ async function createMessage(userId, message) {
     }
 }
 
-module.exports = { createMessage }
+/**
+ * Retrieves messages for a specific user by their user ID.
+ * @param {number} userId - The ID of the user whose messages are to be retrieved.
+ * @returns {Promise<Array>} A promise that resolves to an array of message objects.
+ * @throws {Error} If there is an error during the database query.
+ */
+async function getMessagesById(userId) {
+    try {
+        const [result] = await connection.query("SELECT * FROM messages WHERE user_id = ?", [userId]);
+        return result;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+module.exports = { createMessage, getMessagesById }

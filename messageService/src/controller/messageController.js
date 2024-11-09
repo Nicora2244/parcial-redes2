@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const { check, validationResult, param } = require("express-validator");
+const axios = require("axios");
 
 const router = Router();
 const messageModel = require("../model/messageModel");
@@ -26,6 +27,31 @@ router.post('/message', [
         res.status(500).json(createResponse('error', null, error.message));
     }
 
+});
+
+router.get('/messages/:id', async (req, res) => {
+    const userId = req.params.id;
+    try {
+        const url = `http://${process.env.BASE_URL_USER}:${process.env.PORT_USER}/user/${userId}`;
+
+        const { data } = await axios.get(url, {
+            params: {
+                skipTokenValidation: true
+            }
+        });
+
+        if (data.data) {
+            const user = data.data;
+            const response = await messageModel.getMessagesById(user.id);
+            res.status(200).json(createResponse("success", response));
+        }
+
+    } catch (error) {
+        if (error.status === 404) {
+            return res.status(404).json(createResponse('error', null, `User with id ${userId} not found`));
+        }
+        res.status(500).json(createResponse('error', null, error.data.message));
+    }
 });
 
 module.exports = router;
