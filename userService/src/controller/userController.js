@@ -1,46 +1,19 @@
 const { Router } = require("express");
-const jwt = require('jsonwebtoken');
 const { check, validationResult, param } = require("express-validator");
+
+const { verifyToken, verifyAdminRole } = require("../middleware/authMiddleware");
+
 const router = Router();
 const userModel = require("../model/userModel");
 const { createResponse } = require("../../../utils/utils");
 
 const validRoles = ["admin", "user"];
 
-/**
- * Middleware to verify the JWT token from the request headers.
- * @param {Object} req - The request object.
- * @param {Object} res - The response object.
- * @param {Function} next - The next middleware function.
- * @returns {Object} - Returns a response with status 403 if token is not provided, or status 401 if token is invalid. Otherwise, calls the next middleware.
- */
-const verifyToken = (req, res, next) => {
-    const token = req.headers['authorization'].split(' ')[1];
 
-    if (!token) {
-        return res.status(403).json(createResponse("error", null, "Token is required"));
-    }
-
-    jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
-        if (err) {
-            return res.status(401).json(createResponse("error", null, "Invalid token"));
-        }
-        req.userId = decoded.id;
-        req.userRole = decoded.role;
-        next();
-    });
-};
-
-const verifyAdminRole = (req, res, next) => {
-    if (req.userRole !== 'admin') {
-        return res.status(403).json(createResponse("error", null, "Access denied. Admins only can create user."));
-    }
-    next();
-};
+router.use(verifyToken);
 
 // POST a new user
 router.post("/user",
-    verifyToken,
     verifyAdminRole,
     [
         check("full_name").notEmpty().withMessage("Full name is required").isString().withMessage("Full name must be a string"),
