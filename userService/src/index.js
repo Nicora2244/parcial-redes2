@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const userController = require("./controller/userController");
+const authController = require("./controller/authController");
 
 const app = express();
 
@@ -10,6 +11,7 @@ app.use(express.json());
 
 const PORT_USER = process.env.PORT_USER || 3002;
 
+app.use(authController)
 app.use(userController);
 
 app.listen(PORT_USER, () => {
