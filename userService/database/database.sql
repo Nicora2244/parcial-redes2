@@ -18,8 +18,8 @@ CREATE TABLE users (
 -- Crear la tabla follows
 CREATE TABLE follows (
     id INT PRIMARY KEY AUTO_INCREMENT, 
-    user_p INT NOT NULL,   --- user_p es el usuario que sigue    
-    user_f INT NOT NULL,   --- user_f es el usuario a seguido         
+    user_p INT NOT NULL, 
+    user_f INT NOT NULL,         
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_p) REFERENCES users(id),
