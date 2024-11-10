@@ -54,4 +54,29 @@ router.get('/messages/:id', async (req, res) => {
     }
 });
 
+router.get('/following-messages', async (req, res) => {
+    try {
+        const url = `http://${process.env.BASE_URL_USER}:${process.env.PORT_USER}/following/${req.userId}`;
+        const { data } = await axios.get(url, {
+            params: {
+                skipTokenValidation: true
+            }
+        });
+        const users = data.data;
+        const usersId = users.map(user => user.id);
+
+        const messages = await messageModel.getFollowingMessages(usersId);
+        const response = users.map(user => {
+            return {
+                user: user,
+                messages: messages.filter(message => message.user_id === user.id)
+            };
+        });
+        res.status(200).json(createResponse('success', response));
+
+    } catch (error) {
+        res.status(500).json(createResponse('error', null, error.message));
+    }
+});
+
 module.exports = router;

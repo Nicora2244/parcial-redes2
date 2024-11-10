@@ -46,4 +46,26 @@ async function getMessagesById(userId) {
     }
 }
 
-module.exports = { createMessage, getMessagesById }
+/**
+ * Retrieves messages for the specified user IDs.
+ * @param {Array<number>} userIds - An array of user IDs to retrieve messages for.
+ * @returns {Promise<Array<Object>>} A promise that resolves to an array of message objects.
+ * @throws {Error} If there is an error during the database query.
+ */
+async function getFollowingMessages(userIds) {
+    try {
+        const placeholders = userIds.map(() => '?').join(', ');
+        const sql = `
+            SELECT * FROM messages
+            WHERE user_id IN (${placeholders})
+            ORDER BY user_id;
+        `;
+
+        const [rows] = await connection.execute(sql, userIds);
+        return rows;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+module.exports = { createMessage, getMessagesById, getFollowingMessages }
